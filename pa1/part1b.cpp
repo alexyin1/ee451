@@ -1,6 +1,6 @@
 #include <time.h>
 #include <stdio.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 #define BILLION 1E9
 
 void display_results(int n, struct timespec start, struct timespec stop, double** C){
@@ -30,13 +30,13 @@ void reset(int n, double**A, double**B, double** C){
 
 
 void block_matmul(int n, double**A, double**B, double** C, int block_size){
-	double block[block_size][block_size];
+	//double block[block_size][block_size];
 	//clear block for each index C(i,j)
-	for(int i=0; i<block_size; i++){				
-		for(int j=0; j<block_size; j++){
-			block[i][j] = 0;
-		}
-	}
+	//for(int i=0; i<block_size; i++){				
+	//	for(int j=0; j<block_size; j++){
+	//		block[i][j] = 0;
+	//	}
+	//}
 	// double **block = new double*[block_size];
 	// for(int i=0; i<block_size; i++){				
 	// 	block[i] = new double[block_size];
@@ -50,11 +50,11 @@ void block_matmul(int n, double**A, double**B, double** C, int block_size){
 			for(int k=0; k<n; k+=block_size){   
 				//naive_matmul(block_size, , double **B, block_size)
 				
-				for(int ii=0; ii<block_size; ii++){
-					for(int jj=0; jj<block_size; jj++){
+				for(int ii=i; ii<block_size+i; ii++){
+					for(int jj=j; jj<block_size+j; jj++){
 						for(int kk=k; kk<block_size+k; kk++){
-							//C[i+ii][j+jj] += A[i+ii][k+kk] * B[k+kk][j+jj];
-							block[ii][jj] += A[i+ii][kk] * B[kk][j+jj];		
+							C[ii][jj] += A[ii][kk] * B[kk][jj];
+							//block[ii][jj] += A[i+ii][kk] * B[kk][j+jj];		
 						}
 					}
 				}
@@ -62,12 +62,12 @@ void block_matmul(int n, double**A, double**B, double** C, int block_size){
 
 			//set C[i:i+blocksize, j:j+blocksize] = block and
 			//clear block for each index C(i,j)
-			for(int ii=0; ii<block_size; ii++){	
-				for(int jj=0; jj<block_size; jj++){
-					C[i+ii][j+jj] = block[ii][jj];
-					block[ii][jj] = 0;
-				}
-			}
+			//for(int ii=0; ii<block_size; ii++){	
+			//	for(int jj=0; jj<block_size; jj++){
+			//		C[i+ii][j+jj] = block[ii][jj];
+			//		block[ii][jj] = 0;
+			//	}
+			//}
 		}
 	}
 	// for(int i=0; i<block_size; i++){		
@@ -78,9 +78,10 @@ void block_matmul(int n, double**A, double**B, double** C, int block_size){
 	return;
 }
 
-int main(){
+
+int main(int argc, char* argv[]){
 	struct timespec start, stop;
-	int n = 1024; //4096;
+	int n = atoi(argv[1])	; //4096;
 	//allocate memory
 	double ** A = new double*[n];
 	double ** B = new double*[n];
@@ -91,7 +92,7 @@ int main(){
 		C[i] = new double[n];
 	}
 
-	int block_size = 16;
+	int block_size = 4;
 	reset(n, A, B, C);
 //start timer
 	if( clock_gettime(CLOCK_REALTIME, &start) == -1) { perror("clock gettime");}

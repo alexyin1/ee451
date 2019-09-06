@@ -1,6 +1,6 @@
 #include <time.h>
 #include <stdio.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 #define BILLION 1E9
 
 void display_results(int n, struct timespec start, struct timespec stop, double** C){
@@ -17,14 +17,15 @@ void display_results(int n, struct timespec start, struct timespec stop, double*
 }
 
 void naive_matmul(int n, double**A, double**B, double** C){
-	double sum = 0;
+	//double sum = 0;
 	for(int i=0; i<n; i++){
 		for(int j=0; j<n; j++){
-			sum = 0;
+			//sum = 0;
 			for(int k=0; k<n; k++){
-				sum += A[i][k] * B[k][j];   
+				C[i][j] += A[i][k] * B[k][j];
+				//sum += A[i][k] * B[k][j];   
 			}
-			C[i][j] = sum;
+			//C[i][j] = sum;
 		}
 //		printf ("n=%i, i=%i, j=%i \n", n, i, 0);
 	}
@@ -44,9 +45,9 @@ void reset(int n, double**A, double**B, double** C){
 }
 
 
-int main(){
+int main(int argc, char* argv[]){
 	struct timespec start, stop;
-	int n = 1024; //4096;
+	int n = atoi(argv[1]); //4096;
 	//allocate memory
 	double ** A = new double*[n];
 	double ** B = new double*[n];
