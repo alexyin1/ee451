@@ -1,15 +1,24 @@
+#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <omp.h>
 
+#define BILLION 1E9
 #define H 800 
 #define W 800
 
 #define input_file  "input.raw"
 #define output_file "output1.raw"
 
+void display_results(struct timespec start, struct timespec stop) {
+	double time = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;
+	printf("Execution time = %f sec,\n", time);
+	return;
+}
+
 int main(int argc, char** argv){
+	struct timespec start, stop;
     int i;
     FILE *fp;
 
@@ -24,7 +33,8 @@ int main(int argc, char** argv){
 	fclose(fp);
     
 	// measure the start time here
-	
+	if (clock_gettime(CLOCK_REALTIME, &start) == -1) { perror("clock gettime"); }
+
 	//  Your code goes here
 	unsigned int *cluster_dict = (unsigned int*) malloc (sizeof(unsigned int)*H*W);
 	int num_iterations = 30;
@@ -47,7 +57,7 @@ otherwise, go to Step 2.
 	for (unsigned int iter=0; iter<num_iterations; iter++){
 		//  2. For each data element, compute its ‘distance’ to the mean value of each cluster. Assign
 		//  it to the ‘closest’ cluster.
-		printf("ITER %u \n", iter);
+//		printf("ITER %u \n", iter);
 		for (unsigned int i=0; i<H*W; i++){
 			dist = 255;
 			for(unsigned int j=0; j<num_clusters; j++){
@@ -78,9 +88,9 @@ otherwise, go to Step 2.
 	//
 	
 	// measure the end time here
-	
+	if (clock_gettime(CLOCK_REALTIME, &stop) == -1) { perror("clock gettime"); }
 	// print out the execution time here
-	
+	display_results(start, stop);
 	
 	if (!(fp=fopen(output_file,"wb"))) {
 		printf("can not opern file\n");
