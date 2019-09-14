@@ -47,7 +47,7 @@ void reset(int n, double**A, double**B, double** C){
 
 int main(int argc, char* argv[]){
 	struct timespec start, stop;
-	int n = atoi(argv[1]); //4096;
+	int n = 4096;
 	//allocate memory
 	double ** A = new double*[n];
 	double ** B = new double*[n];

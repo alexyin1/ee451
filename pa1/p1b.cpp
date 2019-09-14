@@ -81,7 +81,7 @@ void block_matmul(int n, double**A, double**B, double** C, int block_size){
 
 int main(int argc, char* argv[]){
 	struct timespec start, stop;
-	int n = atoi(argv[1])	; //4096;
+	int n = 4096;
 	//allocate memory
 	double ** A = new double*[n];
 	double ** B = new double*[n];
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]){
 		C[i] = new double[n];
 	}
 
-	int block_size = 4;
+	int block_size = atoi(argv[1]);
 	reset(n, A, B, C);
 //start timer
 	if( clock_gettime(CLOCK_REALTIME, &start) == -1) { perror("clock gettime");}
