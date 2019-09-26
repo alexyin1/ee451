@@ -6,7 +6,6 @@
 #include <pthread.h>
 
 #define BILLION 1E9
-#define NUM_THREADS 4
 #define H 800 
 #define W 800
 
@@ -22,9 +21,9 @@ struct data_partition{
    float *clusters;
    float *sums;
    float *counts;
+   int num_threads;
 };
 
-struct data_partition data_partition_array[NUM_THREADS];
 pthread_mutex_t mutexsum;
 
 void *classify(void *partition_args){
@@ -39,14 +38,15 @@ void *classify(void *partition_args){
 	float *clusters = my_data->clusters;
 	float *sums = my_data->sums;
 	float *counts = my_data->counts;
+	int num_threads = my_data->num_threads;
 	//stack variables
-	float partial_sums[] = {0,0,0,0};
-	float partial_counts[] = {0,0,0,0};  
+	float partial_sums[] = {0,0,0,0,0,0};
+	float partial_counts[] = {0,0,0,0,0,0};  
 	float dpoint = 0; //  current datapoint value
 	float best_dist = 255;
 	float cur_dist;
 	//printf("thread_id=%d, NUM_THREADS=%d, N=%d \n", thread_id, NUM_THREADS, N);
-	for(unsigned int i = thread_id * N / NUM_THREADS; i < (thread_id+1) * N / NUM_THREADS; i++){
+	for(unsigned int i = thread_id * N / num_threads; i < (thread_id+1) * N / num_threads; i++){
 		best_dist = 255; //max value of 255
 		for(unsigned int j=0; j<num_clusters; j++){
 			dpoint = (float)data[i];
@@ -86,7 +86,6 @@ int main(int argc, char** argv){
     FILE *fp;
 
   	unsigned char *data = (unsigned char*) malloc (sizeof(unsigned char)*H*W);
-
 	// the matrix is stored in a linear array in row major fashion
 	if (!(fp=fopen(input_file, "rb"))) {
 		printf("can not open file\n");
@@ -96,12 +95,14 @@ int main(int argc, char** argv){
 	fclose(fp);
 
 	if (clock_gettime(CLOCK_REALTIME, &start) == -1) { perror("clock gettime"); }
+	int NUM_THREADS = atoi(argv[1]);
+	struct data_partition data_partition_array[NUM_THREADS];
 	unsigned int *cluster_dict = (unsigned int*) malloc (sizeof(unsigned int)*H*W);
 	int num_iterations = 30;
-	int num_clusters = 4;
-	float clusters[] = {0, 85, 170, 255};
-	float sums[] = {0,0,0,0};
-	float counts[] = {0,0,0,0};  
+	int num_clusters = 6;
+	float clusters[] = {0, 65, 100, 125, 190, 255};
+	float sums[] = {0,0,0,0,0,0};
+	float counts[] = {0,0,0,0,0,0};  
 
     pthread_t  threads[NUM_THREADS];
     pthread_mutex_init(&mutexsum, NULL);
@@ -118,6 +119,7 @@ int main(int argc, char** argv){
 			data_partition_array[i].clusters = clusters;
 			data_partition_array[i].sums = sums;
 			data_partition_array[i].counts = counts;
+			data_partition_array[i].num_threads = NUM_THREADS;
 			//classify(i, N, NUM_THREADS, num_clusters, data, cluster_dict, clusters, sums, counts);	
 			rc = pthread_create(&threads[i], NULL, classify, (void *) &data_partition_array[i]);
 			if (rc) { printf("ERROR; return code from pthread_create() is %d\n", rc); exit(-1);}

@@ -2,28 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define BILLION 1E9
-#define NUM_THREADS 4
-
-char *messages[NUM_THREADS];
-
-struct thread_data{
-   int thread_id;
-   char *message;
-};
-
-struct  thread_data  thread_data_array[NUM_THREADS];
-
-void *PrintHello(void *threadarg){
-	struct  thread_data * my_data;
-	my_data = (struct thread_data *) threadarg;
-
-	int  thread_id = my_data->thread_id; 
-	char *hello_msg = my_data->message;
-	printf("Thread %d says %s  \n", thread_id , hello_msg);
-	pthread_exit(NULL);
-	// return;
-}
-
 
 struct column_block{
    int thread_id;
@@ -36,7 +14,6 @@ struct column_block{
 };
 
 
-struct column_block column_block_array[NUM_THREADS];
 
 void *col_matmul(void *block_args){
 	struct column_block * my_data;
@@ -56,7 +33,7 @@ void *col_matmul(void *block_args){
 			}
 		}
 	}
-  	printf("Thread %d now complete\n", thread_id);
+  	//printf("Thread %d now complete\n", thread_id);
 	pthread_exit(NULL);
 	// return;
 }
@@ -65,7 +42,7 @@ void display_results(int n, struct timespec start, struct timespec stop, double*
 	double time = (stop.tv_sec - start.tv_sec)+ (double)(stop.tv_nsec - start.tv_nsec)/1e9;
 
 	printf("Number of FLOPs = %lu, Execution time = %f sec,\n%lf MFLOPs per sec\n", (long)2*n*n*n, time, 1/time/1e6*2*n*n*n);		
-	printf("C[1][1]=%f\n", C[1][1]); //C[100][100]
+	printf("C[100][100]=%f\n", C[100][100]); //C[100][100]
 
 	double accum = ( stop.tv_sec - start.tv_sec )
 	  + ( stop.tv_nsec - start.tv_nsec )
@@ -99,8 +76,10 @@ void reset(int n, double**A, double**B, double** C){
 
 
 int main(int argc, char *argv[]) {
+	int NUM_THREADS = atoi(argv[1]);
+	struct column_block column_block_array[NUM_THREADS];
 	struct timespec start, stop;
-	int n = 1024;
+	int n = 4096;
 	//allocate memory
 	double ** A = new double*[n];
 	double ** B = new double*[n];
@@ -115,11 +94,11 @@ int main(int argc, char *argv[]) {
 	reset(n, A, B, C_naive);
 	reset(n, A, B, C_parallel);
 //start timer
-	if( clock_gettime(CLOCK_REALTIME, &start) == -1) { perror("clock gettime");}
-	naive_matmul(n, A, B, C_naive);
-//end timer 
-	if( clock_gettime( CLOCK_REALTIME, &stop) == -1 ) { perror("clock gettime");}	
-	display_results(n, start, stop, C_naive);
+// 	if( clock_gettime(CLOCK_REALTIME, &start) == -1) { perror("clock gettime");}
+// 	naive_matmul(n, A, B, C_naive);
+// //end timer 
+// 	if( clock_gettime( CLOCK_REALTIME, &stop) == -1 ) { perror("clock gettime");}	
+// 	display_results(n, start, stop, C_naive);
 
 
 	pthread_t  threads[NUM_THREADS];
@@ -144,14 +123,14 @@ int main(int argc, char *argv[]) {
     }
 
 	if( clock_gettime( CLOCK_REALTIME, &stop) == -1 ) { perror("clock gettime");}	
-	display_results(n, start, stop, C_naive);
-	for(int i=0; i<n; i++){
-		for(int j=0; j<n; j++){
-			if(	C_parallel[i][j] != C_naive[i][j]){
-				printf("ERROR at index %d,%d, %f not equal to %f", i, j, C_parallel[i][j], C_naive[i][j]);
-			}
-		}
-	}
+	display_results(n, start, stop, C_parallel);
+	// for(int i=0; i<n; i++){
+	// 	for(int j=0; j<n; j++){
+	// 		if(	C_parallel[i][j] != C_naive[i][j]){
+	// 			printf("ERROR at index %d,%d, %f not equal to %f", i, j, C_parallel[i][j], C_naive[i][j]);
+	// 		}
+	// 	}
+	// }
 
 	//deallocate memory
 	for (int i=0; i<n; i++){
