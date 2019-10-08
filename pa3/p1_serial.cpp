@@ -16,8 +16,6 @@ int main(void){
 	struct timespec start, stop; 
 	double time;
 	Point * data_point = (Point *) malloc (sizeof(Point)*num_of_points);
-	printf("RAND_MAX=%f\n", RAND_MAX);
-	printf("rand()=%f", rand());
 	for(i=0; i<num_of_points; i++){
 		data_point[i].x=(double)rand()/(double)RAND_MAX; // double from 0..1
 		data_point[i].y=(double)rand()/(double)RAND_MAX;
