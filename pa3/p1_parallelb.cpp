@@ -29,32 +29,40 @@ int main(void){
 	////////**********Use OpenMP to parallize this loop***************//
 	omp_set_num_threads(2); // Use 4 threads for all consecutive parallel regions
 	#pragma omp parallel sections //reduction(+:n_circle_pts)
-	{
+	{	
 		#pragma omp section
-		{
-			for(i=0; i<num_of_points/2; i++){ 
-				if((data_point[i].x-0.5)*(data_point[i].x-0.5)+(data_point[i].y-0.5)*(data_point[i].y-0.5)<=0.25){
-					printf("A");
-					n_circle_ptsa++;
-				}	
-				// if( i == (num_of_points/2)-1){
-				// 	printf("loop1, %i\n", n_circle_pts);
-				// }
+		for(i=0; i<num_of_points; i++){ 
+			if((data_point[i].x-0.5)*(data_point[i].x-0.5)+(data_point[i].y-0.5)*(data_point[i].y-0.5)<=0.25){
+				n_circle_ptsa++;
 			}	
-		} 
+		}	
+
+
+		// #pragma omp section
+		// {
+		// 	for(i=0; i<num_of_points/2; i++){ 
+		// 		if((data_point[i].x-0.5)*(data_point[i].x-0.5)+(data_point[i].y-0.5)*(data_point[i].y-0.5)<=0.25){
+		// 			//printf("A");
+		// 			n_circle_ptsa++;
+		// 		}	
+		// 		// if( i == (num_of_points/2)-1){
+		// 		// 	printf("loop1, %i\n", n_circle_pts);
+		// 		// }
+		// 	}	
+		// } 
 		
-		#pragma omp section
-		{
-			for(j=num_of_points/2; j<num_of_points; j++){ 
-				if((data_point[j].x-0.5)*(data_point[j].x-0.5)+(data_point[j].y-0.5)*(data_point[j].y-0.5)<=0.25){
-					printf("B");
-					n_circle_ptsb++;
-				}	
-				// if( j == num_of_points-1){
-				// 	printf("loop2 %i\n", n_circle_pts);
-				// }
-			}	
-		}
+		// #pragma omp section
+		// {
+		// 	for(j=num_of_points/2; j<num_of_points; j++){ 
+		// 		if((data_point[j].x-0.5)*(data_point[j].x-0.5)+(data_point[j].y-0.5)*(data_point[j].y-0.5)<=0.25){
+		// 			//printf("B");
+		// 			n_circle_ptsb++;
+		// 		}	
+		// 		// if( j == num_of_points-1){
+		// 		// 	printf("loop2 %i\n", n_circle_pts);
+		// 		// }
+		// 	}	
+		// }
 		
 	}
 	///////******************************////

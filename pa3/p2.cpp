@@ -3,10 +3,28 @@
 #include <time.h>
 #include <omp.h>
 
-#define		size	   16*1024*1024
+#define	size 16*1024*1024
+struct chunk {
+  int start_idx;
+  int end_idx;
+};
+
+
 
 void quickSort(int *array, int start, int end){
    // you quick sort function goes here  
+	queue <int> q;
+ 	chunk temp;
+ 	temp.start_idx=start;
+ 	temp.end_idx=end;
+ 	q.emplace(temp);
+
+ 	while(q.empty() == false){
+		temp= q.front();
+	    start_idx = temp.start_idx;
+	    end_idx = temp.end_idx;
+ 	}
+
    
 }
 
@@ -23,6 +41,8 @@ int main(void){
 	if( clock_gettime(CLOCK_REALTIME, &start) == -1) { perror("clock gettime");}
 	////////**********Your code goes here***************//
 	
+
+	quickSort(m, 0, size);
 		
 			
 	///////******************************////
